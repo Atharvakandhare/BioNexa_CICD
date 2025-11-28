@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { auth } from '../firebase';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faVideo, faComments, faUserMd, faUser, faCalendarAlt, faPrescription, faSignOutAlt, faPlus, faSearch, faStethoscope, faNotesMedical, faSpinner, faArrowLeft, faExclamationTriangle, faStar, faGraduationCap, faBriefcase, faUsers, faClock, faTimesCircle, faCalendarDay, faClock as faClockSolid, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faVideo, faComments, faUserMd, faUser, faCalendarAlt, faPrescription, faSignOutAlt, faPlus, faSearch, faStethoscope, faNotesMedical, faSpinner, faArrowLeft, faExclamationTriangle, faStar, faGraduationCap, faBriefcase, faUsers, faTimesCircle, faCalendarDay, faClock as faClockSolid } from '@fortawesome/free-solid-svg-icons';
 import { motion } from 'framer-motion';
 import { signOut } from 'firebase/auth';
 import { analyzeSymptoms } from '../services/aiService';
@@ -105,14 +105,6 @@ const Dashboard = () => {
     setIsBooking(true);
   };
 
-  const handleSearchBySpecialization = () => {
-    setSearchType('specialization');
-  };
-
-  const handleSearchBySymptoms = () => {
-    setSearchType('symptoms');
-  };
-
   const handleBackToAppointments = () => {
     setIsBooking(false);
     setSearchType(null);
@@ -126,16 +118,6 @@ const Dashboard = () => {
     setSelectedSpecialization('');
     setSymptoms('');
     setAnalysisResult(null);
-  };
-
-  const handleSpecializationSearch = () => {
-    if (!selectedSpecialization) return;
-    setSearchType('doctors-list');
-  };
-
-  const handleSymptomsSearch = () => {
-    if (!analysisResult) return;
-    setSearchType('doctors-list');
   };
 
   const handleDateSelect = (date) => {
@@ -555,7 +537,7 @@ const Dashboard = () => {
                       </div>
                       <button 
                         className="search-button"
-                        onClick={handleSpecializationSearch}
+                        onClick={() => selectedSpecialization && setSearchType('doctors-list')}
                         disabled={!selectedSpecialization}
                       >
                         <FontAwesomeIcon icon={faSearch} />

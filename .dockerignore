@@ -1,0 +1,16 @@
+node_modules
+npm-debug.log
+dist
+build
+.DS_Store
+.env
+.env.*
+backend/node_modules
+backend/.env.local
+backend/uploads
+backend/serviceAccountKey.json
+backend/config/firebase-service-account.json
+Dockerfile.dev
+docker-compose.dev.yml
+*.pem
+

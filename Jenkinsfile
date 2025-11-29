@@ -73,7 +73,39 @@ spec:
             steps {
                 container('node') {
                     sh '''
-                        npm ci
+                        echo "===== Configuring npm settings ====="
+                        # Configure npm with increased timeouts and retries
+                        npm config set fetch-timeout 300000
+                        npm config set fetch-retries 5
+                        npm config set fetch-retry-mintimeout 10000
+                        npm config set fetch-retry-maxtimeout 60000
+                        npm config set maxsockets 15
+                        
+                        # Test npm registry connectivity
+                        echo "Testing npm registry connectivity..."
+                        npm ping || echo "npm ping failed, but continuing..."
+                        
+                        echo "===== Installing dependencies with retry logic ====="
+                        # Retry logic for npm ci
+                        MAX_RETRIES=3
+                        RETRY_COUNT=0
+                        while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+                            if npm ci --prefer-offline --no-audit; then
+                                echo "npm ci succeeded"
+                                break
+                            else
+                                RETRY_COUNT=$((RETRY_COUNT + 1))
+                                if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                                    echo "npm ci failed, retrying in 10 seconds... (Attempt $RETRY_COUNT/$MAX_RETRIES)"
+                                    sleep 10
+                                else
+                                    echo "npm ci failed after $MAX_RETRIES attempts"
+                                    exit 1
+                                fi
+                            fi
+                        done
+                        
+                        echo "===== Building frontend ====="
                         npm run build
                     '''
                 }
@@ -84,7 +116,39 @@ spec:
             steps {
                 dir('backend') {
                     container('node') {
-                        sh 'npm ci'
+                        sh '''
+                            echo "===== Configuring npm settings ====="
+                            # Configure npm with increased timeouts and retries
+                            npm config set fetch-timeout 300000
+                            npm config set fetch-retries 5
+                            npm config set fetch-retry-mintimeout 10000
+                            npm config set fetch-retry-maxtimeout 60000
+                            npm config set maxsockets 15
+                            
+                            # Test npm registry connectivity
+                            echo "Testing npm registry connectivity..."
+                            npm ping || echo "npm ping failed, but continuing..."
+                            
+                            echo "===== Installing backend dependencies with retry logic ====="
+                            # Retry logic for npm ci
+                            MAX_RETRIES=3
+                            RETRY_COUNT=0
+                            while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+                                if npm ci --prefer-offline --no-audit; then
+                                    echo "npm ci succeeded"
+                                    break
+                                else
+                                    RETRY_COUNT=$((RETRY_COUNT + 1))
+                                    if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                                        echo "npm ci failed, retrying in 10 seconds... (Attempt $RETRY_COUNT/$MAX_RETRIES)"
+                                        sleep 10
+                                    else
+                                        echo "npm ci failed after $MAX_RETRIES attempts"
+                                        exit 1
+                                    fi
+                                fi
+                            done
+                        '''
                     }
                 }
             }

@@ -3,6 +3,7 @@ WORKDIR /app
 
 # Install dependencies first for better caching
 COPY package.json package-lock.json ./
+COPY .npmrc ./
 RUN npm ci --only=production
 
 # Copy application source

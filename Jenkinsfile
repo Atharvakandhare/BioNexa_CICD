@@ -58,7 +58,7 @@ spec:
         BACKEND_IMAGE  = "bionexa-backend"
         // SonarQube URL as seen from the Jenkins agent / sonar-scanner container.
         // Update this to the actual reachable URL (e.g. http://<ip-or-host>:9000).
-        SONAR_HOST_URL = "http://sonarqube.imcc.com"
+        SONAR_HOST_URL = "http://my-sonarqube-sonarqube.sonarqube.svc.cluster.local:9000"
     }
 
     stages {

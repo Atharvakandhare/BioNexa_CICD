@@ -56,6 +56,9 @@ spec:
         NEXUS_REPO = "bionexa_88"
         FRONTEND_IMAGE = "bionexa-frontend"
         BACKEND_IMAGE  = "bionexa-backend"
+        // SonarQube URL as seen from the Jenkins agent / sonar-scanner container.
+        // Update this to the actual reachable URL (e.g. http://<ip-or-host>:9000).
+        SONAR_HOST_URL = "http://sonarqube.imcc.com"
     }
 
     stages {
@@ -104,13 +107,9 @@ spec:
             steps {
                 container('sonar-scanner') {
                     withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                        sh """
-                            sonar-scanner \
-                                -Dsonar.projectKey=bionexa_2401088 \
-                                -Dsonar.sources=backend,src \
-                                -Dsonar.host.url=http://sonarqube.imcc.com \
-                                -Dsonar.token=${SONAR_TOKEN}
-                        """
+                        withEnv(["SONAR_TOKEN=${SONAR_TOKEN}"]) {
+                            sh 'sonar-scanner -Dsonar.projectKey=bionexa_2401088 -Dsonar.sources=backend,src -Dsonar.host.url=$SONAR_HOST_URL'
+                        }
                     }
                 }
             }

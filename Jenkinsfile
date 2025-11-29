@@ -56,10 +56,9 @@ spec:
         NEXUS_REPO = "bionexa_88"
         FRONTEND_IMAGE = "bionexa-frontend"
         BACKEND_IMAGE  = "bionexa-backend"
-        // SonarQube URL - try common service name patterns
-        // Format: <service-name>.<namespace>.svc.cluster.local:<port>
-        // Common patterns: sonarqube.sonarqube.svc.cluster.local:9000
-        SONAR_HOST_URL = "http://sonarqube.sonarqube.svc.cluster.local:9000"
+        // SonarQube URL - using the service name that resolves (from original error)
+        // If this fails, check: kubectl get svc -n sonarqube
+        SONAR_HOST_URL = "http://my-sonarqube-sonarqube.sonarqube.svc.cluster.local:9000"
     }
 
     stages {
@@ -113,8 +112,17 @@ spec:
                                 echo "===== Testing SonarQube Connectivity ====="
                                 echo "Target URL: ${SONAR_HOST_URL}"
                                 
-                                # Test connectivity (will show error but continue)
-                                curl -s --connect-timeout 5 ${SONAR_HOST_URL}/api/system/status || echo "Note: Connection test failed, but continuing..."
+                                # Try DNS resolution
+                                echo "Testing DNS resolution..."
+                                nslookup my-sonarqube-sonarqube.sonarqube.svc.cluster.local || echo "DNS lookup failed"
+                                
+                                # Try different ports in case 9000 is wrong
+                                echo "Testing port 9000..."
+                                timeout 3 bash -c "echo > /dev/tcp/my-sonarqube-sonarqube.sonarqube.svc.cluster.local/9000" 2>/dev/null && echo "Port 9000 is open" || echo "Port 9000 connection failed"
+                                
+                                # Try HTTP endpoint
+                                echo "Testing HTTP endpoint..."
+                                curl -v --connect-timeout 10 --max-time 10 ${SONAR_HOST_URL}/api/system/status 2>&1 | head -20 || echo "HTTP connection failed"
                                 
                                 echo "===== Running SonarQube Analysis ====="
                                 sonar-scanner \

@@ -56,9 +56,10 @@ spec:
         NEXUS_REPO = "bionexa_88"
         FRONTEND_IMAGE = "bionexa-frontend"
         BACKEND_IMAGE  = "bionexa-backend"
-        // SonarQube URL as seen from the Jenkins agent / sonar-scanner container.
-        // Update this to the actual reachable URL (e.g. http://<ip-or-host>:9000).
-        SONAR_HOST_URL = "http://my-sonarqube-sonarqube.sonarqube.svc.cluster.local:9000"
+        // SonarQube URL - try common service name patterns
+        // Format: <service-name>.<namespace>.svc.cluster.local:<port>
+        // Common patterns: sonarqube.sonarqube.svc.cluster.local:9000
+        SONAR_HOST_URL = "http://sonarqube.sonarqube.svc.cluster.local:9000"
     }
 
     stages {
@@ -108,7 +109,20 @@ spec:
                 container('sonar-scanner') {
                     withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
                         withEnv(["SONAR_TOKEN=${SONAR_TOKEN}"]) {
-                            sh 'sonar-scanner -Dsonar.projectKey=bionexa_2401088 -Dsonar.sources=backend,src -Dsonar.host.url=$SONAR_HOST_URL'
+                            sh '''
+                                echo "===== Testing SonarQube Connectivity ====="
+                                echo "Target URL: ${SONAR_HOST_URL}"
+                                
+                                # Test connectivity (will show error but continue)
+                                curl -s --connect-timeout 5 ${SONAR_HOST_URL}/api/system/status || echo "Note: Connection test failed, but continuing..."
+                                
+                                echo "===== Running SonarQube Analysis ====="
+                                sonar-scanner \
+                                    -Dsonar.projectKey=bionexa_2401088 \
+                                    -Dsonar.sources=backend,src \
+                                    -Dsonar.host.url=${SONAR_HOST_URL} \
+                                    -Dsonar.token=${SONAR_TOKEN}
+                            '''
                         }
                     }
                 }

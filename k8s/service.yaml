@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: bionexa-backend-svc
-  namespace: bionexa-dev
+  namespace: "2401088"
   labels:
     app: bionexa-backend
 spec:
@@ -18,7 +18,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: bionexa-frontend-svc
-  namespace: bionexa-dev
+  namespace: "2401088"
   labels:
     app: bionexa-frontend
 spec:

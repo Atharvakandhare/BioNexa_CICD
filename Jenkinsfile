@@ -123,7 +123,7 @@ spec:
                                 # Try HTTP endpoint
                                 echo "Testing HTTP endpoint..."
                                 curl -v --connect-timeout 10 --max-time 10 ${SONAR_HOST_URL}/api/system/status 2>&1 | head -20 || echo "HTTP connection failed"
-                                
+             
                                 echo "===== Running SonarQube Analysis ====="
                                 sonar-scanner \
                                     -Dsonar.projectKey=bionexa_2401088 \

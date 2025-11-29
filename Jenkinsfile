@@ -51,7 +51,8 @@ spec:
     }
 
     environment {
-        NAMESPACE = "2401088"
+        // Kubernetes namespace - must match the namespace in k8s/development.yaml and k8s/service.yaml
+        NAMESPACE = "2401088" 
         NEXUS_HOST = "nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085"
         NEXUS_REPO = "bionexa_88"
         FRONTEND_IMAGE = "bionexa-frontend"
@@ -179,6 +180,10 @@ spec:
                         echo "===== Applying Manifests ====="
                         kubectl apply -n ${NAMESPACE} -f k8s/development.yaml
                         kubectl apply -n ${NAMESPACE} -f k8s/service.yaml
+
+                        echo "===== Updating Image Tags to Build Number ====="
+                        kubectl set image deployment/bionexa-frontend frontend=${NEXUS_HOST}/${NEXUS_REPO}/${FRONTEND_IMAGE}:v${BUILD_NUMBER} -n ${NAMESPACE}
+                        kubectl set image deployment/bionexa-backend backend=${NEXUS_HOST}/${NEXUS_REPO}/${BACKEND_IMAGE}:v${BUILD_NUMBER} -n ${NAMESPACE}
 
                         echo "===== Rollout Status ====="
                         kubectl rollout status deployment/bionexa-frontend -n ${NAMESPACE} --timeout=60s || true

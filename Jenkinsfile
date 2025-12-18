@@ -191,8 +191,8 @@ spec:
              
                                 echo "===== Running SonarQube Analysis ====="
                                 sonar-scanner \
-                                    -Dsonar.projectKey=bionexa_2401088 \
-                                    -Dsonar.sources=backend,src \
+                                    -Dsonar.projectKey=bionexa_88 \
+                                    -Dsonar.sources=. \
                                     -Dsonar.host.url=${SONAR_HOST_URL} \
                                     -Dsonar.token=${SONAR_TOKEN}
                             '''

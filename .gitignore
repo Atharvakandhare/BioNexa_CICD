@@ -27,6 +27,7 @@ node_modules/
 .sonar
 .sonar/**/*
 .scannerwork/**/*
+sonar-scanner/
 backend/config/firebase-service-account.json
 backend/serviceAccountKey.json
 .env
